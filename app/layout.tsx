@@ -2,16 +2,16 @@ import "./globals.css";
 import localFont from "next/font/local";
 import Navbar from "./components/Navbar";
 
-const myFont = localFont({
-  src: "../public/fonts/RoobertTRIAL-Regular-BF67243fd53fdf2.otf",
+const roobert = localFont({
+  src: "../public/fonts/Roobert-TRIAL-Regular.woff2",
   display: "swap",
-  variable: "--font-roobert-trial",
+  variable: "--font-roobert",
 });
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${myFont.variable}`}>
-      <body>
+    <html lang="en" className={`${roobert.variable}`}>
+      <body className="font-sans antialiased">
         <Navbar />
         {children}
       </body>
