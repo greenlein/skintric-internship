@@ -2,4 +2,6 @@
 
 @theme {
   --font-sans: var(--font-roobert), sans-serif;
+  --color-text: #1a1b1c;
+  --color-background: #fcfcfc;
 }
