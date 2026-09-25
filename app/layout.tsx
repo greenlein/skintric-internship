@@ -11,7 +11,7 @@ const roobert = localFont({
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${roobert.variable}`}>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased max-w-[1920px] mx-auto">
         <Navbar />
         {children}
       </body>

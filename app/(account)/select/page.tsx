@@ -29,20 +29,12 @@ const SelectPage = () => {
           {tiles.map(({ label, position }) => (
             <div
               key={label}
-              onClick={
-                label === "DEMOGRAPHICS"
-                  ? () => router.push("/summary")
-                  : undefined
-              }
-              className={`${position} flex ${
-                label === "DEMOGRAPHICS"
-                  ? "cursor-pointer"
-                  : "cursor-not-allowed"
+              onClick={label === "DEMOGRAPHICS" ? () => router.push("/summary") : undefined}
+              className={`${position} flex  ${
+                label === "DEMOGRAPHICS" ? "cursor-pointer" : "cursor-not-allowed"
               } items-center justify-center bg-[#f2f2f2] text-center font-medium leading-[1.45] transition-colors hover:bg-[#e5e5e5]`}
             >
-              <span className="block -rotate-45 whitespace-pre-line">
-                {label}
-              </span>
+              <span className="block -rotate-45 whitespace-pre-line font-semibold">{label}</span>
             </div>
           ))}
         </div>

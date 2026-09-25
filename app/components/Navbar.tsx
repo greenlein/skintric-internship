@@ -11,7 +11,7 @@ export default function Navbar() {
 
       <button
         type="button"
-        className="border border-black bg-black px-3 py-2 text-[9px] font-semibold tracking-[0.18em] text-white uppercase"
+        className="border border-black bg-black px-3 py-2 text-[9px] font-semibold tracking-[0.18em] text-white uppercase cursor-not-allowed"
       >
         ENTER CODE
       </button>

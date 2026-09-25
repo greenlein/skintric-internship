@@ -28,7 +28,7 @@ export interface DemographicData {
   };
 }
 
-const initialState: DemographicData = {
+export const initialState: DemographicData = {
   race: {
     black: 0,
     white: 0,
@@ -55,19 +55,53 @@ const initialState: DemographicData = {
   },
 };
 
+const sortByHighestValue = <T extends Record<string, number>>(valueMap: T) =>
+  Object.fromEntries(Object.entries(valueMap).sort(([, valueA], [, valueB]) => Number(valueB) - Number(valueA))) as T;
+
 export const demographicSlice = createSlice({
   name: "demographics",
   initialState,
   reducers: {
     setDemographic: (state, action: PayloadAction<DemographicData>) => {
       const { data }: any = action.payload;
-      state.race = data.race;
-      state.age = data.age;
-      state.gender = data.gender;
+
+      state.race = sortByHighestValue(data.race);
+      state.age = sortByHighestValue(data.age);
+      state.gender = sortByHighestValue(data.gender);
+    },
+    resetDemographic: (state) => {
+      state.race = sortByHighestValue({ ...state.race });
+      state.age = sortByHighestValue({ ...state.age });
+      state.gender = sortByHighestValue({ ...state.gender });
+    },
+    manualRaceUpdate: (state, action: PayloadAction<{ race: keyof DemographicData["race"] }>) => {
+      const { race } = action.payload;
+
+      state.race = {
+        ...state.race,
+        [race]: state.race[race],
+      } as DemographicData["race"];
+    },
+    manualAgeUpdate: (state, action: PayloadAction<{ age: keyof DemographicData["age"] }>) => {
+      const { age } = action.payload;
+
+      state.age = {
+        ...state.age,
+        [age]: state.age[age],
+      } as DemographicData["age"];
+    },
+    manualGenderUpdate: (state, action: PayloadAction<{ gender: keyof DemographicData["gender"] }>) => {
+      const { gender } = action.payload;
+
+      state.gender = {
+        ...state.gender,
+        [gender]: state.gender[gender],
+      } as DemographicData["gender"];
     },
   },
 });
 
-export const { setDemographic } = demographicSlice.actions;
+export const { setDemographic, resetDemographic, manualRaceUpdate, manualAgeUpdate, manualGenderUpdate } =
+  demographicSlice.actions;
 
 export default demographicSlice.reducer;

@@ -8,7 +8,7 @@ const Home = () => {
 
   return (
     <main className=" h-[calc(100vh-80px)] overflow-hidden bg-background font-sans text-text">
-      <section className="relative flex h-full w-screen items-center justify-center">
+      <section className="relative flex h-full w-full items-center justify-center">
         <div className="absolute left-6 top-1/2 z-10 -translate-y-1/2">
           {!(hoveredDirection === "right") && (
             <ArrowLink
