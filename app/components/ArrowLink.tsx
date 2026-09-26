@@ -6,19 +6,17 @@ import { useRouter } from "next/navigation";
 type ArrowLinkProps = {
   label: string;
   direction: "left" | "right";
+  color?: "black" | "white";
   destination?: string;
+  navigationDelay?: number;
+  disabled?: boolean;
   showBox?: boolean;
+  onClick?: () => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 };
 
-export const ArrowLinkBox = ({
-  direction,
-  isPinging,
-}: {
-  direction: "left" | "right";
-  isPinging: boolean;
-}) => (
+export const ArrowLinkBox = ({ direction, isPinging }: { direction: "left" | "right"; isPinging: boolean }) => (
   <>
     <div
       className={`pointer-events-none absolute ${
@@ -39,8 +37,12 @@ export const ArrowLinkBox = ({
 export const ArrowLink = ({
   label,
   direction,
+  color = "black",
   showBox = false,
   destination,
+  navigationDelay = 0,
+  disabled = false,
+  onClick,
   onMouseEnter,
   onMouseLeave,
 }: ArrowLinkProps) => {
@@ -53,21 +55,32 @@ export const ArrowLink = ({
       <button
         type="button"
         aria-label={label}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
+        disabled={disabled}
+        onMouseEnter={disabled ? undefined : onMouseEnter}
+        onMouseLeave={disabled ? undefined : onMouseLeave}
         onClick={() => {
+          if (disabled) return;
+
           setIsPinging(true);
-          window.setTimeout(() => setIsPinging(false), 1500);
-          router.push(`/${destination}`);
+          window.setTimeout(() => setIsPinging(false), 2000);
+          if (onClick) {
+            onClick();
+          } else if (destination) {
+            window.setTimeout(() => router.push(`/${destination}`), navigationDelay);
+          }
         }}
-        className={`group flex items-center gap-4 text-[10px] font-medium text-text ${
-          direction === "right" ? "flex-row-reverse" : ""
-        }`}
+        className={`group flex items-center gap-4 text-[10px] font-medium ${
+          color === "white" ? "text-white" : "text-text"
+        } ${direction === "right" ? "flex-row-reverse" : ""} ${disabled ? "cursor-not-allowed" : ""}`}
       >
-        <span className="grid h-9 w-9 rotate-45 place-items-center border border-text transition-colors group-hover:bg-[#f1f1f1]">
-          <span className="-rotate-45 text-xl leading-none">
-            {direction === "left" ? "‹" : "›"}
-          </span>
+        <span
+          className={`grid h-9 w-9 rotate-45 place-items-center border transition-colors ${
+            color === "white"
+              ? `border-white ${disabled ? "" : "group-hover:bg-white/20"}`
+              : `border-text ${disabled ? "" : "group-hover:bg-[#f1f1f1]"}`
+          }`}
+        >
+          <span className="-rotate-45 text-xl leading-none">{direction === "left" ? "‹" : "›"}</span>
         </span>
         <span>{label}</span>
       </button>

@@ -1,16 +1,14 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
-import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useRef } from "react";
+import type { ChangeEvent } from "react";
 import RotatingSquares from "@/app/components/RotatingSquares";
 import { useRouter } from "next/navigation";
-import LoadingDemographic from "./(Preparing)/page";
-import { setDemographic, type DemographicData } from "@/app/redux/demographics";
-import { store, type AppDispatch } from "@/app/redux/store";
-import TakePicture from "@/app/components/TakePicture";
+import LoadingScreen from "@/app/components/LoadingScreen";
+import { store } from "@/app/redux/store";
 import { Provider } from "react-redux";
 import { ArrowLink } from "@/app/components/ArrowLink";
+import { useImageUpload } from "@/app/components/UploadImageToApi";
 
 export default function ResultsPage() {
   return (
@@ -22,56 +20,33 @@ export default function ResultsPage() {
 
 const ResultsContent = () => {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
+  const { isUploading, uploadImage } = useImageUpload();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [status, setStatus] = useState("");
 
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const delay = (ms: number) =>
-      new Promise((resolve) => setTimeout(resolve, ms));
     const image = event.target.files?.[0];
     if (!image) return;
 
-    const formData = new FormData();
-    formData.append("image", image);
-    setIsUploading(true);
+    await uploadImage(image);
+    event.target.value = "";
+  };
 
-    try {
-      const response = await axios.post<DemographicData>(
-        "/api/phase-two",
-        formData,
-      );
-      dispatch(setDemographic(response.data));
-      console.log(response.data);
-      setStatus("Upload successful");
-
-      // Simulate API fetching data for 2.5 seconds before navigating to the next page
-      await delay(2000);
-      router.push("/select");
-    } catch (error) {
-      console.error("Upload failed:", error);
-      setStatus("Upload failed");
-    } finally {
-      event.target.value = "";
-    }
+  const handleClick = () => {
+    router.push("results/camera");
   };
 
   return (
     <main className="relative h-[calc(100vh-64px)] overflow-hidden bg-[#fafafa] text-[#1f1f1f]">
-      <p className="absolute left-6 top-8 text-[12px] font-semibold tracking-[-0.03em]">
-        TO START ANALYSIS
-      </p>
+      <p className="absolute left-6 top-8 text-[12px] font-semibold tracking-[-0.03em]">TO START ANALYSIS</p>
       <div className="h-full w-full">
         {!isUploading ? (
           <div className="flex h-full items-center justify-center gap-8 px-6 md:gap-24">
             <div className="relative aspect-[2/1] w-full max-w-[560px] flex-1">
-              <button className="cursor-pointer hover:scale-105 active:scale-95 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background z-1 rounded-full h-[125px] w-[125px] overflow-hidden">
-                <img
-                  src="/assets/aperture.png"
-                  alt=""
-                  className="h-[125px] w-[125px]"
-                />
+              <button
+                className="cursor-pointer hover:scale-105 active:scale-95 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background z-1 rounded-full h-[125px] w-[125px] overflow-hidden"
+                onClick={() => handleClick()}
+              >
+                <img src="/assets/aperture.png" alt="" className="h-[125px] w-[125px]" />
               </button>
 
               <p className="absolute right-0 top-0">
@@ -93,19 +68,9 @@ const ResultsContent = () => {
                 onClick={() => inputRef.current?.click()}
                 disabled={isUploading}
               >
-                <img
-                  src="/assets/landscape.png"
-                  alt=""
-                  className="h-[125px] w-[125px] overflow-hidden"
-                />
+                <img src="/assets/landscape.png" alt="" className="h-[125px] w-[125px] overflow-hidden" />
               </button>
-              <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="sr-only"
-              />
+              <input ref={inputRef} type="file" accept="image/*" onChange={handleImageChange} className="sr-only" />
 
               <p className="absolute bottom-0 left-0 text-end">
                 ALLOW A.I. <br />
@@ -119,7 +84,7 @@ const ResultsContent = () => {
             </div>
           </div>
         ) : (
-          <LoadingDemographic />
+          <LoadingScreen text="PREPARING YOUR ANALYSIS ..." />
         )}
       </div>
       <div className="absolute bottom-7 left-7">

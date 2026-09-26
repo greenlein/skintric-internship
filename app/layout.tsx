@@ -1,6 +1,7 @@
 import "./globals.css";
 import localFont from "next/font/local";
 import Navbar from "./components/Navbar";
+import Webcam from "react-webcam";
 
 const roobert = localFont({
   src: "../public/fonts/Roobert-TRIAL-Regular.woff2",

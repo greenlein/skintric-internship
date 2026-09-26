@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import RotatingSquares from "../../components/RotatingSquares";
+import LoadingScreen from "@/app/components/LoadingScreen";
 
 const PROMPTS = [
   { placeholder: "Introduce yourself", key: "name", autoComplete: "name" },
@@ -16,6 +17,7 @@ export default function IntroductionPage() {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const currentPrompt = PROMPTS[currentPromptIndex];
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,6 +41,7 @@ export default function IntroductionPage() {
   };
 
   const postData = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.post("/api/phase-one", {
         name: localStorage.getItem("name"),
@@ -49,36 +52,44 @@ export default function IntroductionPage() {
     } catch (error) {
       console.error("Error submitting data:", error);
       setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      <RotatingSquares size={550} />
-      <form onSubmit={handleSubmit} className="absolute inset-0 flex flex-col items-center justify-center">
-        <label htmlFor={currentPrompt.key} className="mb-3 text-[12px] text-[#a6a6a6]">
-          CLICK TO TYPE
-        </label>
-        <input
-          id={currentPrompt.key}
-          name={currentPrompt.key}
-          autoComplete={currentPrompt.autoComplete}
-          value={input}
-          onChange={(event) => {
-            setInput(event.target.value);
-            setError("");
-          }}
-          aria-describedby={error ? "input-error" : undefined}
-          aria-invalid={Boolean(error)}
-          placeholder={currentPrompt.placeholder}
-          className="w-[356px] border-0 border-b border-[#555] bg-transparent px-0 pb-1 text-center text-[39px] font-light tracking-[-0.07em] outline-none placeholder:text-[#202124] focus:border-[#202124]"
-        />
-        {error && (
-          <p id="input-error" role="alert" className="mt-2 text-[12px] text-red-600">
-            {error}
-          </p>
-        )}
-      </form>
+      {!isLoading ? (
+        <>
+          <RotatingSquares size={550} />
+          <form onSubmit={handleSubmit} className="absolute inset-0 flex flex-col items-center justify-center">
+            <label htmlFor={currentPrompt.key} className="mb-3 text-[12px] text-[#a6a6a6]">
+              CLICK TO TYPE
+            </label>
+            <input
+              id={currentPrompt.key}
+              name={currentPrompt.key}
+              autoComplete={currentPrompt.autoComplete}
+              value={input}
+              onChange={(event) => {
+                setInput(event.target.value);
+                setError("");
+              }}
+              aria-describedby={error ? "input-error" : undefined}
+              aria-invalid={Boolean(error)}
+              placeholder={currentPrompt.placeholder}
+              className="w-[356px] border-0 border-b border-[#555] bg-transparent px-0 pb-1 text-center text-[39px] font-light tracking-[-0.07em] outline-none placeholder:text-[#202124] focus:border-[#202124]"
+            />
+            {error && (
+              <p id="input-error" role="alert" className="mt-2 text-[12px] text-red-600">
+                {error}
+              </p>
+            )}
+          </form>
+        </>
+      ) : (
+        <LoadingScreen text="LOADING ..." />
+      )}
     </>
   );
 }
