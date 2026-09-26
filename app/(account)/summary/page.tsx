@@ -50,7 +50,9 @@ const getDefaultSelections = (demographics: DemographicData) => ({
   gender: getTopEntry(demographics.gender)[0],
 });
 
-const getSavedSelections = (demographics: DemographicData): Record<CategoryKey, string> => {
+const getSavedSelections = (
+  demographics: DemographicData,
+): Record<CategoryKey, string> => {
   if (typeof window === "undefined") {
     return getDefaultSelections(demographics);
   }
@@ -75,15 +77,20 @@ const getSavedSelections = (demographics: DemographicData): Record<CategoryKey, 
 
 export default function Summary() {
   const dispatch = useDispatch();
-  const demographics = useSelector((state: { demographics: DemographicData }) => state.demographics);
-  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("race");
-  const [selectedDemographicKeys, setSelectedDemographicKeys] = useState<Record<CategoryKey, string>>(() =>
-    getSavedSelections(demographics),
+  const demographics = useSelector(
+    (state: { demographics: DemographicData }) => state.demographics,
   );
+  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("race");
+  const [selectedDemographicKeys, setSelectedDemographicKeys] = useState<
+    Record<CategoryKey, string>
+  >(() => getSavedSelections(demographics));
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(SELECTION_STORAGE_KEY, JSON.stringify(selectedDemographicKeys));
+      window.localStorage.setItem(
+        SELECTION_STORAGE_KEY,
+        JSON.stringify(selectedDemographicKeys),
+      );
     }
   }, [selectedDemographicKeys]);
 
@@ -92,8 +99,12 @@ export default function Summary() {
     [demographics, selectedCategory],
   );
 
-  const selectedKey = selectedDemographicKeys[selectedCategory] ?? selectedList[0]?.[0] ?? "";
-  const selectedTopEntry = selectedList.find(([label]) => label === selectedKey) ?? selectedList[0] ?? ["", 0];
+  const selectedKey =
+    selectedDemographicKeys[selectedCategory] ?? selectedList[0]?.[0] ?? "";
+  const selectedTopEntry = selectedList.find(
+    ([label]) => label === selectedKey,
+  ) ??
+    selectedList[0] ?? ["", 0];
   const selectedTopValue = Number(selectedTopEntry[1]);
 
   const categoryButtons = categories.map((category) => {
@@ -116,7 +127,9 @@ export default function Summary() {
   };
 
   const handleConfirm = () => {
-    const confirmed = window.confirm("Do you want to confirm the current selections?");
+    const confirmed = window.confirm(
+      "Do you want to confirm the current selections?",
+    );
 
     if (!confirmed) {
       return;
@@ -129,7 +142,9 @@ export default function Summary() {
     }
 
     if (selectedCategory === "race") {
-      dispatch(manualRaceUpdate({ race: key as keyof DemographicData["race"] }));
+      dispatch(
+        manualRaceUpdate({ race: key as keyof DemographicData["race"] }),
+      );
       return;
     }
 
@@ -138,20 +153,25 @@ export default function Summary() {
       return;
     }
 
-    dispatch(manualGenderUpdate({ gender: key as keyof DemographicData["gender"] }));
+    dispatch(
+      manualGenderUpdate({ gender: key as keyof DemographicData["gender"] }),
+    );
   };
 
   const hasPendingChanges =
     selectedDemographicKeys.race !== getSortedTopEntry(demographics.race)[0] ||
     selectedDemographicKeys.age !== getSortedTopEntry(demographics.age)[0] ||
-    selectedDemographicKeys.gender !== getSortedTopEntry(demographics.gender)[0];
+    selectedDemographicKeys.gender !==
+      getSortedTopEntry(demographics.gender)[0];
 
   const handleReset = () => {
     if (!hasPendingChanges) {
       return;
     }
 
-    const confirmed = window.confirm("Are you sure you want to reset the selections?");
+    const confirmed = window.confirm(
+      "Are you sure you want to reset the selections?",
+    );
 
     if (!confirmed) {
       return;
@@ -168,21 +188,26 @@ export default function Summary() {
     setSelectedDemographicKeys(nextSelections);
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(SELECTION_STORAGE_KEY, JSON.stringify(nextSelections));
+      window.localStorage.setItem(
+        SELECTION_STORAGE_KEY,
+        JSON.stringify(nextSelections),
+      );
     }
   };
 
   return (
     <>
-      <header className="absolute left-4 top-10 z-10 uppercase leading-[1.45]">
-        <h1 className="text-[82px] font-black leading-[0.9] tracking-[-0.08em] text-[#171717]">DEMOGRAPHICS</h1>
+      <header className="absolute left-4 top-10 z-10 uppercase leading-[1.45] h-2/10">
+        <h1 className="text-[9vh] font-black leading-[0.9] tracking-[-0.08em] text-[#171717]">
+          DEMOGRAPHICS
+        </h1>
         <p className="mt-1 text-[12px] font-medium uppercase tracking-[0.16em] text-[#1c1c1c]">
           PREDICTED RACE &amp; AGE
         </p>
       </header>
 
-      <main className="min-h-screen bg-white px-[30px] pb-8 pt-[195px] text-[#202020]">
-        <div className="grid min-h-[545px] grid-cols-[208px_minmax(420px,1fr)_448px] gap-[14px]">
+      <section className="h-8/10 bg-background mt-[18vh] px-[30px] text-[#202020]">
+        <div className="grid min-h-[480px] grid-cols-[208px_minmax(420px,1fr)_448px] gap-[14px]">
           <aside className="flex flex-col gap-2">
             {categoryButtons.map(({ key, label, title, isSelected }) => (
               <button
@@ -190,17 +215,25 @@ export default function Summary() {
                 type="button"
                 onClick={() => setSelectedCategory(key)}
                 className={`flex h-[104px] flex-col justify-between border-t border-[#666] px-4 py-4 text-left transition-colors duration-150 ${
-                  isSelected ? "bg-[#1d1e1e] text-white" : "bg-[#efefef] text-[#202020] hover:bg-[#d9d9d9]"
+                  isSelected
+                    ? "bg-[#1d1e1e] text-white"
+                    : "bg-[#efefef] text-[#202020] hover:bg-[#d9d9d9]"
                 }`}
               >
-                <span className="text-[14px] font-semibold uppercase">{label}</span>
-                <span className="text-[14px] font-semibold uppercase">{title}</span>
+                <span className="text-[14px] font-semibold uppercase">
+                  {label}
+                </span>
+                <span className="text-[14px] font-semibold uppercase">
+                  {title}
+                </span>
               </button>
             ))}
           </aside>
 
           <section className="relative border-t bg-[#f7f7f7]">
-            <h2 className="px-4 pt-5 text-[38px] font-light tracking-[-2px]">{toTitleCase(selectedTopEntry[0])}</h2>
+            <h2 className="px-4 pt-5 text-[4vh] font-light tracking-[-2px]">
+              {toTitleCase(selectedTopEntry[0])}
+            </h2>
 
             <div className="absolute bottom-[25px] right-[16px] flex h-[384px] w-[384px] items-center justify-center">
               <svg
@@ -208,7 +241,15 @@ export default function Summary() {
                 viewBox="0 0 384 384"
                 aria-label="Demographic confidence ring"
               >
-                <circle cx="192" cy="192" r="170" fill="none" stroke="#292929" strokeOpacity="0.12" strokeWidth="3" />
+                <circle
+                  cx="192"
+                  cy="192"
+                  r="170"
+                  fill="none"
+                  stroke="#292929"
+                  strokeOpacity="0.12"
+                  strokeWidth="3"
+                />
                 <circle
                   cx="192"
                   cy="192"
@@ -217,7 +258,12 @@ export default function Summary() {
                   stroke="#292929"
                   strokeWidth="3"
                   strokeDasharray={2 * Math.PI * 170}
-                  strokeDashoffset={2 * Math.PI * 170 * (1 - Math.min(Math.max(selectedTopValue, 0), 1))}
+                  strokeDashoffset={
+                    2 *
+                    Math.PI *
+                    170 *
+                    (1 - Math.min(Math.max(selectedTopValue, 0), 1))
+                  }
                   style={{ transition: "stroke-dashoffset 500ms ease" }}
                 />
               </svg>
@@ -243,7 +289,9 @@ export default function Summary() {
                   <li
                     key={label}
                     className={`flex h-[48px] cursor-pointer items-center justify-between px-4 transition-colors duration-150 ${
-                      isSelected ? "bg-[#1d1e1e] text-white" : "text-[#202020] hover:bg-[#d9d9d9] hover:text-[#202020]"
+                      isSelected
+                        ? "bg-[#1d1e1e] text-white"
+                        : "text-[#202020] hover:bg-[#d9d9d9] hover:text-[#202020]"
                     }`}
                     onClick={() => selectDemographic(label)}
                   >
@@ -259,7 +307,7 @@ export default function Summary() {
           </section>
         </div>
 
-        <div className="mt-6 flex items-center justify-between px-2">
+        <div className="mt-3 flex items-center justify-between px-2">
           <ArrowLink label="BACK" direction="left" destination="select" />
 
           <p className="text-[12px] tracking-[0.02em] text-[#7b7b7b]">
@@ -273,7 +321,7 @@ export default function Summary() {
               disabled={!hasPendingChanges}
               className={`border px-5 py-2 text-[12px] font-medium uppercase tracking-[0.18em]  transition-colors duration-150 ${
                 hasPendingChanges
-                  ? "border-[#1d1d1d] bg-white text-[#1d1d1d] hover:bg-[#f3f3f3]"
+                  ? "border-[#1d1d1d] bg-background text-[#1d1d1d] hover:bg-[#f3f3f3]"
                   : "cursor-not-allowed border-[#c4c4c4] bg-[#e8e8e8] text-[#9a9a9a]"
               }`}
             >
@@ -288,7 +336,7 @@ export default function Summary() {
             </button>
           </div>
         </div>
-      </main>
+      </section>
     </>
   );
 }
